@@ -1,0 +1,16 @@
+.img {
+    height: 200px;
+    background-size: cover;
+    background-position: center center;
+}
+
+.item{
+    overflow: hidden;
+}
+
+.item a{
+    color: black;
+}
+.item a:hover{
+    text-decoration: none;
+}
