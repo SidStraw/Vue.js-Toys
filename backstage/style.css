@@ -1,0 +1,6 @@
+.itemImg {
+    height: 200px;
+    /* background-color: gray; */
+    background-position: center center;
+    background-size: cover;
+}

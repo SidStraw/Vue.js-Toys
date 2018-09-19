@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>後台系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./onoffSwitch.css">
+</head>
+
+<body>
+
+    <div id="app" class="container pt-5">
+        <form @submit.prevent class="my-4">
+
+            <div class="form-group">
+                <label for="title">課程名稱</label>
+                <input type="text" class="form-control" id="title" name="title" v-model="title">
+            </div>
+            <div class="form-group">
+                <label for="url">課程連結</label>
+                <input type="text" class="form-control" id="url" name="url" v-model="url">
+            </div>
+            <div class="form-group">
+                <label for="teacher">講師</label>
+                <input type="text" class="form-control" id="teacher" name="teacher" v-model="teacher">
+            </div>
+            <!-- 切換開關，搭配onoffSwitch.css -->
+            <div class="onoffswitch">
+                <input type="checkbox" name="completed" class="onoffswitch-checkbox" id="myonoffswitch" v-model="completed">
+                <label class="onoffswitch-label" for="myonoffswitch">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+            </div>
+            <div class="form-group">
+                <label for="image">課程圖片</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" @change="imgLoaded">
+            </div>
+            <button type="submit" class="btn btn-primary d-block mx-auto" @click="submit">Submit</button>
+        </form>
+
+        <div class="card-columns">
+
+            <template v-for="item in items">
+                <div class="card">
+                    <!-- <img class="card-img-top" :src="item.image" alt="Card image cap"> -->
+                    <div class="itemImg" :style="`background-image: url(${item.image})`"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{item.title}}</h5>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">{{item.teacher}}</small>
+                    </div>
+                </div>
+            </template>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        const vm = new Vue({
+            el: "#app",
+            // template:`
+
+            // `,
+            data: {
+                items: [],
+                title: '',
+                url: '',
+                teacher: '',
+                completed: false,
+                image: '',
+
+            },
+            methods: {
+                submit() {
+                    fetch('http://localhost:8081/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                title: this.title,
+                                url: this.url,
+                                teacher: this.teacher,
+                                completed: this.completed,
+                                image: this.image,
+                            })
+                        })
+                        .then(() => {
+                            this.title = '';
+                            this.url = '';
+                            this.teacher = '';
+                            this.completed = false;
+                            this.image = ''
+                            this.loadData();
+                        })
+                        .catch(e => console.error('POST錯誤:' + e))
+
+                },
+                imgLoaded(e) {
+                    const file = e.target.files.item(0);
+                    const reader = new FileReader();
+                    reader.addEventListener('load', e => this.image = e.target.result);
+                    reader.readAsDataURL(file);
+                },
+                loadData() {
+                    fetch('http://localhost:8081/')
+                        .then(res => res.json())
+                        .then(res => {
+                            this.items = res;
+                            console.log(this.items)
+                        })
+                        .catch((e) => console.error('GET錯誤:' + e))
+                }
+            },
+            mounted() {
+                this.loadData();
+            },
+        })
+    </script>
+</body>
+
+</html>
