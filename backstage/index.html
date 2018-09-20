@@ -42,27 +42,30 @@
                 <label for="image">課程圖片</label>
                 <input type="file" class="form-control" id="image" name="image" accept="image/*" @change="imgLoaded">
             </div>
-            <button type="submit" class="btn btn-primary d-block mx-auto" @click="submit">Submit</button>
+            <button type="submit" class="btn btn-primary btn-lg d-block mx-auto" @click="submit">Submit</button>
         </form>
 
-        <div class="card-columns">
+        <div class="row">
 
             <template v-for="item in items">
-                <div class="card">
+                <div class="col-12 col-sm-6 col-lg-4 my-3">
+                <a class="card" target="_blank" :href="item.url">
                     <!-- <img class="card-img-top" :src="item.image" alt="Card image cap"> -->
-                    <div class="itemImg" :style="`background-image: url(${item.image})`"></div>
+                    <div class="itemImg" :style="`background-image: url(${item.image})`">
+                        <p class="position-absolute text-light bg-dark p-2 rounded-left lessonFinal" v-if="item.completed">已完成上架</p>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">{{item.title}}</h5>
+                        <h5 class="card-title text-center">{{item.title}}</h5>
                     </div>
                     <div class="card-footer">
                         <small class="text-muted">{{item.teacher}}</small>
                     </div>
+                </a>
                 </div>
             </template>
 
 
         </div>
-    </div>
 
 
 
@@ -79,70 +82,72 @@
 
 
 
+        <script>
+            const vm = new Vue({
+                el: "#app",
+                // template:`
 
+                // `,
+                data: {
+                    items: [],
+                    title: '',
+                    url: '',
+                    teacher: '',
+                    completed: false,
+                    image: '',
 
-    <script>
-        const vm = new Vue({
-            el: "#app",
-            // template:`
-
-            // `,
-            data: {
-                items: [],
-                title: '',
-                url: '',
-                teacher: '',
-                completed: false,
-                image: '',
-
-            },
-            methods: {
-                submit() {
-                    fetch('http://localhost:8081/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                title: this.title,
-                                url: this.url,
-                                teacher: this.teacher,
-                                completed: this.completed,
-                                image: this.image,
+                },
+                methods: {
+                    submit() {
+                        if (this.title && this.url && this.teacher) {
+                            fetch('http://localhost:8081/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        title: this.title,
+                                        url: this.url,
+                                        teacher: this.teacher,
+                                        completed: this.completed,
+                                        image: this.image,
+                                    })
+                                })
+                                .then(() => {
+                                    this.title = '';
+                                    this.url = '';
+                                    this.teacher = '';
+                                    this.completed = false;
+                                    this.image = ''
+                                    console.log(document.querySelector('#image').value)
+                                    document.querySelector('#image').value = '';
+                                    console.log(document.querySelector('#image').value)
+                                    this.loadData();
+                                })
+                                .catch(e => console.error('POST錯誤:' + e))
+                        }
+                    },
+                    imgLoaded(e) {
+                        const file = e.target.files.item(0);
+                        const reader = new FileReader();
+                        reader.addEventListener('load', e => this.image = e.target.result);
+                        reader.readAsDataURL(file);
+                    },
+                    loadData() {
+                        fetch('http://localhost:8081/')
+                            .then(res => res.json())
+                            .then(res => {
+                                this.items = res;
+                                // console.log(this.items)
                             })
-                        })
-                        .then(() => {
-                            this.title = '';
-                            this.url = '';
-                            this.teacher = '';
-                            this.completed = false;
-                            this.image = ''
-                            this.loadData();
-                        })
-                        .catch(e => console.error('POST錯誤:' + e))
-
+                            .catch((e) => console.error('GET錯誤:' + e))
+                    }
                 },
-                imgLoaded(e) {
-                    const file = e.target.files.item(0);
-                    const reader = new FileReader();
-                    reader.addEventListener('load', e => this.image = e.target.result);
-                    reader.readAsDataURL(file);
+                mounted() {
+                    this.loadData();
                 },
-                loadData() {
-                    fetch('http://localhost:8081/')
-                        .then(res => res.json())
-                        .then(res => {
-                            this.items = res;
-                            console.log(this.items)
-                        })
-                        .catch((e) => console.error('GET錯誤:' + e))
-                }
-            },
-            mounted() {
-                this.loadData();
-            },
-        })
-    </script>
+            })
+        </script>
 </body>
 
 </html>
