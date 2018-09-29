@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>組件練習：登入系統</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <component :is="vueComponent"></component>
+  </div>
+
+
+
+
+  <script>
+    Vue.component('login', {
+      template: `
+      <form @submit.prevent>
+        <label for="user">帳號</label>
+        <input type="text" id="user" name="user" v-model="user">
+        <label for="pw">密碼</label>
+        <input type="password" id="pw" name="pw" v-model="pw">
+        <button @click="submit">送出</button>
+      </form>
+      `,
+      data() {
+        return {
+          user: "",
+          pw: "",
+        }
+      },
+      methods:{
+        submit(){
+          console.log(this.user,this.pw);
+        }
+      }
+
+    })
+
+    const vm = new Vue({
+      el: '#app',
+
+      data: {
+        vueComponent: 'login',
+
+      },
+    })
+  </script>
+</body>
+
+</html>
